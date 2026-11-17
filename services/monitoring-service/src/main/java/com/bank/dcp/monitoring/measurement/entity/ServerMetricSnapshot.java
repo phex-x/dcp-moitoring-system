@@ -6,11 +6,18 @@ import java.math.BigDecimal;
 import java.util.UUID;
 import com.bank.dcp.monitoring.server.entity.Server;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name="server_metric_snapshots")
 public class ServerMetricSnapshot {

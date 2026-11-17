@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
+@lombok.Builder
 public record EnergyMeasurementResponse(
         UUID id,
         UUID serverId,

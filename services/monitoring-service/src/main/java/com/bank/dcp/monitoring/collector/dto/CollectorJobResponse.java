@@ -3,6 +3,7 @@ package com.bank.dcp.monitoring.collector.dto;
 import java.time.Instant;
 import java.util.UUID;
 
+@lombok.Builder
 public record CollectorJobResponse(
         UUID id,
         UUID sourceId,

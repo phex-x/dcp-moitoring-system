@@ -3,6 +3,7 @@ package com.bank.dcp.monitoring.source.dto;
 import java.time.Instant;
 import java.util.UUID;
 
+@lombok.Builder
 public record MeasurementSourceResponse(
         UUID id,
         UUID dataCenterId,

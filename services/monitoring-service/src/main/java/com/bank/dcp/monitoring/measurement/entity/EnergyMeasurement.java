@@ -7,11 +7,18 @@ import java.util.UUID;
 import com.bank.dcp.monitoring.server.entity.Server;
 import com.bank.dcp.monitoring.source.entity.MeasurementSource;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name="energy_measurements")
 public class EnergyMeasurement {

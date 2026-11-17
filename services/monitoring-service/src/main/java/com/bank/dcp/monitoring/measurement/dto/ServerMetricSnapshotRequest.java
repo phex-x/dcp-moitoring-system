@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
+@lombok.Builder
 public record ServerMetricSnapshotRequest(
         UUID serverId,
         Instant capturedAt,
