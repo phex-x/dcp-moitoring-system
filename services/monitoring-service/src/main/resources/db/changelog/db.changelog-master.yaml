@@ -1,0 +1,10 @@
+databaseChangeLog:
+  # Каждая схема Monitoring Service изменяется отдельной версионируемой миграцией.
+  # Первый changeset предметной модели будет добавлен вместе с доменной feature.
+  - changeSet:
+      id: 000-create-service-schema
+      author: dcp-team
+      changes:
+        - sql:
+            comment: Инициализирует схему миграций сервиса без предметных таблиц.
+            sql: SELECT 1
