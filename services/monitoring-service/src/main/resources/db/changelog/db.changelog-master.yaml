@@ -4,13 +4,13 @@ databaseChangeLog:
       author: Dmitriy Serov
       changes:
         - sqlFile:
-            path: sql/001-create-monitoring-domain.sql
+            path: sql/migration/001-create-monitoring-domain.sql
             relativeToChangelogFile: true
             splitStatements: true
             stripComments: true
       rollback:
         - sqlFile:
-            path: sql/001-create-monitoring-domain-rollback.sql
+            path: sql/rollback/001-create-monitoring-domain-rollback.sql
             relativeToChangelogFile: true
             splitStatements: true
             stripComments: true
