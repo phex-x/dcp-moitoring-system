@@ -29,7 +29,7 @@ public class CollectorJobService {
         );
 
         if (Objects.nonNull(sourceId)) {
-            return repository.getAllBySource_Id(sourceId, safePageable).map(mapper::toResponse);
+            return repository.getAllBySourceId(sourceId, safePageable).map(mapper::toResponse);
         }
 
         return repository.findAll(safePageable).map(mapper::toResponse);
