@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.server.dto;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.DecimalMin;
@@ -15,19 +16,19 @@ import java.util.UUID;
 @Builder
 public record ServerPatchRequest(
         UUID rackId,
-        @Size(max = 120)
+        @Size(max = Constants.Validation.MAX_HOSTNAME_LENGTH)
         String hostname,
-        @Size(max = 64)
+        @Size(max = Constants.Validation.MAX_ASSET_TAG_LENGTH)
         String assetTag,
-        @Size(max = 100)
+        @Size(max = Constants.Validation.MAX_VENDOR_LENGTH)
         String vendor,
-        @Size(max = 100)
+        @Size(max = Constants.Validation.MAX_VENDOR_LENGTH)
         String model,
         @Positive
         Integer cpuCores,
-        @DecimalMin("0.0")
+        @DecimalMin(Constants.Validation.MIN_NON_NEGATIVE)
         BigDecimal ramGb,
-        @DecimalMin("0.0")
+        @DecimalMin(Constants.Validation.MIN_NON_NEGATIVE)
         BigDecimal ratedPowerW,
         InfrastructureStatus status,
         @PastOrPresent

@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.server.service;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.common.PageableValidator;
 import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import com.bank.dcp.monitoring.common.exception.BusinessRuleViolationException;
@@ -32,12 +33,12 @@ public class ServerService {
     public Page<ServerResponse> list(Pageable pageable) {
         Pageable safePageable = PageableValidator.validate(
                 pageable,
-                "hostname",
-                "hostname",
-                "assetTag",
-                "status",
-                "installedAt",
-                "createdAt"
+                Constants.SortFields.HOSTNAME,
+                Constants.SortFields.HOSTNAME,
+                Constants.SortFields.ASSET_TAG,
+                Constants.SortFields.STATUS,
+                Constants.SortFields.INSTALLED_AT,
+                Constants.SortFields.CREATED_AT
         );
 
         return repository.findAll(safePageable).map(mapper::toResponse);
@@ -60,7 +61,7 @@ public class ServerService {
     public ServerResponse patch(UUID id, ServerPatchRequest request) {
         Server server = getServerById(id);
         if (Objects.nonNull(request.status()) && !server.getStatus().canTransitionTo(request.status())) {
-            throw new BusinessRuleViolationException("Invalid InfrastructureStatus transition");
+            throw new BusinessRuleViolationException(Constants.Messages.INVALID_INFRASTRUCTURE_STATUS_TRANSITION);
         }
         Rack rack = Objects.isNull(request.rackId())
                 ? null
@@ -75,7 +76,7 @@ public class ServerService {
     public void deactivate(UUID id) {
         Server server = getServerById(id);
         if (!server.getStatus().canTransitionTo(InfrastructureStatus.INACTIVE)) {
-            throw new BusinessRuleViolationException("Decommissioned infrastructure cannot be deactivated");
+            throw new BusinessRuleViolationException(Constants.Messages.DECOMMISSIONED_INFRASTRUCTURE_DEACTIVATION);
         }
         mapper.deactivate(server);
         repository.saveAndFlush(server);
@@ -83,11 +84,11 @@ public class ServerService {
 
     private Server getServerById(UUID id) {
         return repository.getServerById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Server", id));
+                .orElseThrow(() -> new ResourceNotFoundException(Constants.ResourceNames.SERVER, id));
     }
 
     private Rack getRackById(UUID id) {
         return rackRepository.getRackById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Rack", id));
+                .orElseThrow(() -> new ResourceNotFoundException(Constants.ResourceNames.RACK, id));
     }
 }

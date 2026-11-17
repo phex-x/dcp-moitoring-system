@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.source.service;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.common.PageableValidator;
 import com.bank.dcp.monitoring.common.enums.MeasurementSourceStatus;
 import com.bank.dcp.monitoring.common.enums.MeasurementSourceType;
@@ -36,7 +37,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class MeasurementSourceService {
-    private static final int DEFAULT_SAMPLES_PER_SERVER = 1;
+    private static final int DEFAULT_SAMPLES_PER_SERVER = Constants.Validation.DEFAULT_SAMPLES_PER_SERVER;
 
     private final MeasurementSourceRepository sourceRepository;
     private final DataCenterRepository dataCenterRepository;
@@ -49,11 +50,11 @@ public class MeasurementSourceService {
     public Page<MeasurementSourceResponse> list(Pageable pageable) {
         Pageable safePageable = PageableValidator.validate(
                 pageable,
-                "name",
-                "name",
-                "type",
-                "status",
-                "pollIntervalSec"
+                Constants.SortFields.NAME,
+                Constants.SortFields.NAME,
+                Constants.SortFields.TYPE,
+                Constants.SortFields.STATUS,
+                Constants.SortFields.POLL_INTERVAL_SEC
         );
 
         return sourceRepository.findAll(safePageable).map(sourceMapper::toResponse);
@@ -76,7 +77,7 @@ public class MeasurementSourceService {
     public MeasurementSourceResponse patch(UUID id, MeasurementSourcePatchRequest request) {
         MeasurementSource source = getSourceById(id);
         if (Objects.nonNull(request.status()) && !source.getStatus().canTransitionTo(request.status())) {
-            throw new BusinessRuleViolationException("Invalid MeasurementSourceStatus transition");
+            throw new BusinessRuleViolationException(Constants.Messages.INVALID_SOURCE_STATUS_TRANSITION);
         }
         DataCenter dataCenter = Objects.isNull(request.dataCenterId())
                 ? null
@@ -91,7 +92,7 @@ public class MeasurementSourceService {
     public void deactivate(UUID id) {
         MeasurementSource source = getSourceById(id);
         if (!source.getStatus().canTransitionTo(MeasurementSourceStatus.INACTIVE)) {
-            throw new BusinessRuleViolationException("Source cannot transition to INACTIVE");
+            throw new BusinessRuleViolationException(Constants.Messages.SOURCE_CANNOT_BE_INACTIVE);
         }
         sourceMapper.deactivate(source);
         sourceRepository.saveAndFlush(source);
@@ -104,8 +105,8 @@ public class MeasurementSourceService {
         boolean available = source.getType() == MeasurementSourceType.SIMULATOR
                 && source.getStatus() != MeasurementSourceStatus.INACTIVE;
         String message = available
-                ? "Simulator source is available"
-                : "Source is inactive or has no registered collector";
+                ? Constants.Messages.SIMULATOR_SOURCE_AVAILABLE
+                : Constants.Messages.SOURCE_UNAVAILABLE;
 
         if (available) {
             sourceMapper.recordProbeSuccess(source, checkedAt);
@@ -126,7 +127,7 @@ public class MeasurementSourceService {
     public CollectorJobResponse synchronize(UUID id, CollectorSyncRequest request) {
         MeasurementSource source = getSourceById(id);
         if (source.getStatus() != MeasurementSourceStatus.ACTIVE) {
-            throw new BusinessRuleViolationException("Inactive source cannot be synchronized");
+            throw new BusinessRuleViolationException(Constants.Messages.INACTIVE_SOURCE_SYNCHRONIZATION);
         }
 
         int samplesPerServer = Objects.isNull(request) || Objects.isNull(request.samplesPerServer())
@@ -155,11 +156,11 @@ public class MeasurementSourceService {
 
     private MeasurementSource getSourceById(UUID id) {
         return sourceRepository.getMeasurementSourceById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Measurement source", id));
+                .orElseThrow(() -> new ResourceNotFoundException(Constants.ResourceNames.SOURCE, id));
     }
 
     private DataCenter getDataCenterById(UUID id) {
         return dataCenterRepository.getDataCenterById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Data center", id));
+                .orElseThrow(() -> new ResourceNotFoundException(Constants.ResourceNames.DATA_CENTER, id));
     }
 }

@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.measurement.dto;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.common.enums.MeasurementQualityStatus;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -22,22 +23,22 @@ public record EnergyMeasurementRequest(
         @PastOrPresent
         Instant measuredAt,
         @NotNull
-        @DecimalMin("0.0")
+        @DecimalMin(Constants.Validation.MIN_NON_NEGATIVE)
         BigDecimal powerW,
-        @DecimalMin("0.0")
+        @DecimalMin(Constants.Validation.MIN_NON_NEGATIVE)
         BigDecimal energyIntervalKwh,
-        @DecimalMin("0.0")
-        @DecimalMax("100.0")
+        @DecimalMin(Constants.Validation.MIN_NON_NEGATIVE)
+        @DecimalMax(Constants.Validation.MAX_PERCENT)
         BigDecimal cpuLoadPct,
-        @DecimalMin("0.0")
-        @DecimalMax("100.0")
+        @DecimalMin(Constants.Validation.MIN_NON_NEGATIVE)
+        @DecimalMax(Constants.Validation.MAX_PERCENT)
         BigDecimal memoryUsagePct,
-        @DecimalMin("-50.0")
-        @DecimalMax("150.0")
+        @DecimalMin(Constants.Validation.MIN_TEMPERATURE)
+        @DecimalMax(Constants.Validation.MAX_TEMPERATURE)
         BigDecimal temperatureC,
         @NotNull
         MeasurementQualityStatus qualityStatus,
-        @Size(max = 64)
-        @Pattern(regexp = "[a-fA-F0-9]{64}")
+        @Size(max = Constants.Validation.SHA_256_LENGTH)
+        @Pattern(regexp = Constants.Validation.SHA_256_PATTERN)
         String checksum
 ) {}

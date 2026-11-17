@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.datacenter.service;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.common.PageableValidator;
 import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import com.bank.dcp.monitoring.common.exception.BusinessRuleViolationException;
@@ -28,12 +29,12 @@ public class DataCenterService {
     public Page<DataCenterResponse> list(Pageable pageable) {
         Pageable safePageable = PageableValidator.validate(
                 pageable,
-                "name",
-                "code",
-                "name",
-                "location",
-                "status",
-                "createdAt"
+                Constants.SortFields.NAME,
+                Constants.SortFields.CODE,
+                Constants.SortFields.NAME,
+                Constants.SortFields.LOCATION,
+                Constants.SortFields.STATUS,
+                Constants.SortFields.CREATED_AT
         );
 
         return repository.findAll(safePageable).map(mapper::toResponse);
@@ -55,7 +56,7 @@ public class DataCenterService {
     public DataCenterResponse patch(UUID id, DataCenterPatchRequest request) {
         DataCenter entity = getDataCenterById(id);
         if (Objects.nonNull(request.status()) && !entity.getStatus().canTransitionTo(request.status())) {
-            throw new BusinessRuleViolationException("Invalid InfrastructureStatus transition");
+            throw new BusinessRuleViolationException(Constants.Messages.INVALID_INFRASTRUCTURE_STATUS_TRANSITION);
         }
         mapper.patch(request, entity);
 
@@ -67,7 +68,7 @@ public class DataCenterService {
     public void deactivate(UUID id) {
         DataCenter entity = getDataCenterById(id);
         if (!entity.getStatus().canTransitionTo(InfrastructureStatus.INACTIVE)) {
-            throw new BusinessRuleViolationException("Decommissioned infrastructure cannot be deactivated");
+            throw new BusinessRuleViolationException(Constants.Messages.DECOMMISSIONED_INFRASTRUCTURE_DEACTIVATION);
         }
         mapper.deactivate(entity);
         repository.saveAndFlush(entity);
@@ -75,6 +76,6 @@ public class DataCenterService {
 
     private DataCenter getDataCenterById(UUID id) {
         return repository.getDataCenterById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Data center", id));
+                .orElseThrow(() -> new ResourceNotFoundException(Constants.ResourceNames.DATA_CENTER, id));
     }
 }

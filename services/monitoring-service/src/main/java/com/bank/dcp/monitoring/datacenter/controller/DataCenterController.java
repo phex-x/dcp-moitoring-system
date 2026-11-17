@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.datacenter.controller;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.datacenter.dto.DataCenterPatchRequest;
 import com.bank.dcp.monitoring.datacenter.dto.DataCenterRequest;
 import com.bank.dcp.monitoring.datacenter.dto.DataCenterResponse;
@@ -22,17 +23,17 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/data-centers")
+@RequestMapping(Constants.Api.DATA_CENTERS)
 @RequiredArgsConstructor
 public class DataCenterController {
     private final DataCenterService dataCenterService;
 
     @GetMapping
-    public Page<DataCenterResponse> list(@PageableDefault(size = 20) Pageable pageable) {
+    public Page<DataCenterResponse> list(@PageableDefault(size = Constants.Pagination.DEFAULT_PAGE_SIZE) Pageable pageable) {
         return dataCenterService.list(pageable);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(Constants.Api.RESOURCE_ID)
     public DataCenterResponse getById(@PathVariable UUID id) {
         return dataCenterService.getById(id);
     }
@@ -43,12 +44,12 @@ public class DataCenterController {
         return dataCenterService.create(request);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping(Constants.Api.RESOURCE_ID)
     public DataCenterResponse patch(@PathVariable UUID id, @Valid @RequestBody DataCenterPatchRequest request) {
         return dataCenterService.patch(id, request);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(Constants.Api.RESOURCE_ID)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deactivate(@PathVariable UUID id) {
         dataCenterService.deactivate(id);

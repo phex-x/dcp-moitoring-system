@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.datacenter.controller;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.datacenter.dto.RackPatchRequest;
 import com.bank.dcp.monitoring.datacenter.dto.RackRequest;
 import com.bank.dcp.monitoring.datacenter.dto.RackResponse;
@@ -22,17 +23,17 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/racks")
+@RequestMapping(Constants.Api.RACKS)
 @RequiredArgsConstructor
 public class RackController {
     private final RackService rackService;
 
     @GetMapping
-    public Page<RackResponse> list(@PageableDefault(size = 20) Pageable pageable) {
+    public Page<RackResponse> list(@PageableDefault(size = Constants.Pagination.DEFAULT_PAGE_SIZE) Pageable pageable) {
         return rackService.list(pageable);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(Constants.Api.RESOURCE_ID)
     public RackResponse getById(@PathVariable UUID id) {
         return rackService.getById(id);
     }
@@ -43,12 +44,12 @@ public class RackController {
         return rackService.create(request);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping(Constants.Api.RESOURCE_ID)
     public RackResponse patch(@PathVariable UUID id, @Valid @RequestBody RackPatchRequest request) {
         return rackService.patch(id, request);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(Constants.Api.RESOURCE_ID)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deactivate(@PathVariable UUID id) {
         rackService.deactivate(id);
