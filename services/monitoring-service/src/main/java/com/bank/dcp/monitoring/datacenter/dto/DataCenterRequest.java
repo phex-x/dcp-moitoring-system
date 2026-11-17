@@ -6,6 +6,7 @@ import lombok.Builder;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.DecimalMax;
 import java.math.BigDecimal;
 
 @Builder
@@ -16,7 +17,9 @@ public record DataCenterRequest(
         @Size(max = 150) String name,
         @Size(max = 255) String location,
         @Size(max = 64) String timezone,
-        @DecimalMin("0.0") BigDecimal pueTarget,
+        @DecimalMin("1.0")
+        @DecimalMax("10.0")
+        BigDecimal pueTarget,
         @NotNull
         InfrastructureStatus status
 ) {

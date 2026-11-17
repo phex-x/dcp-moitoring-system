@@ -3,6 +3,7 @@ package com.bank.dcp.monitoring.datacenter.dto;
 import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import java.math.BigDecimal;
@@ -17,8 +18,8 @@ public record DataCenterPatchRequest(
         String location,
         @Size(max = 64)
         String timezone,
-        @DecimalMin("0.0")
+        @DecimalMin("1.0")
+        @DecimalMax("10.0")
         BigDecimal pueTarget,
-        @NotNull
         InfrastructureStatus status
 ) {}

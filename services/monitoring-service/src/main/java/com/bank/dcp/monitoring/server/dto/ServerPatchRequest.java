@@ -3,6 +3,8 @@ package com.bank.dcp.monitoring.server.dto;
 import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -27,7 +29,7 @@ public record ServerPatchRequest(
         BigDecimal ramGb,
         @DecimalMin("0.0")
         BigDecimal ratedPowerW,
-        @NotNull
         InfrastructureStatus status,
+        @PastOrPresent
         Instant installedAt
 ) {}

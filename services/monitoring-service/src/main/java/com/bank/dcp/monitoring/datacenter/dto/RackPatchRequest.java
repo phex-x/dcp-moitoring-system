@@ -17,6 +17,5 @@ public record RackPatchRequest(
         String name,
         @DecimalMin("0.0")
         BigDecimal powerCapacityW,
-        @NotNull
         InfrastructureStatus status
 ) {}

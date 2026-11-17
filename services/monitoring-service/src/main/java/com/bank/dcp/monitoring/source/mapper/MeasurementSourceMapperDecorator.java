@@ -39,24 +39,32 @@ public abstract class MeasurementSourceMapperDecorator implements MeasurementSou
 
     @Override
     public void recordProbeSuccess(MeasurementSource entity, Instant checkedAt) {
+        entity.setStatus(MeasurementSourceStatus.ACTIVE);
         entity.setLastSuccessAt(checkedAt);
         entity.setLastError(null);
     }
 
     @Override
     public void recordProbeFailure(MeasurementSource entity, Instant checkedAt, String errorMessage) {
+        if (entity.getStatus().canTransitionTo(MeasurementSourceStatus.UNAVAILABLE)) {
+            entity.setStatus(MeasurementSourceStatus.UNAVAILABLE);
+        }
         entity.setLastErrorAt(checkedAt);
         entity.setLastError(errorMessage);
     }
 
     @Override
     public void recordSyncSuccess(MeasurementSource entity, Instant finishedAt) {
+        entity.setStatus(MeasurementSourceStatus.ACTIVE);
         entity.setLastSuccessAt(finishedAt);
         entity.setLastError(null);
     }
 
     @Override
     public void recordSyncFailure(MeasurementSource entity, Instant finishedAt, String errorMessage) {
+        if (entity.getStatus().canTransitionTo(MeasurementSourceStatus.UNAVAILABLE)) {
+            entity.setStatus(MeasurementSourceStatus.UNAVAILABLE);
+        }
         entity.setLastErrorAt(finishedAt);
         entity.setLastError(errorMessage);
     }

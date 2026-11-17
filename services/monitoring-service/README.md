@@ -50,3 +50,6 @@ Liquibase changelog расположен в `src/main/resources/db/changelog/db.
 - `POST /api/v1/measurements/bulk` — атомарный пакетный импорт до 1000 измерений.
 
 Списки принимают `page`, `size`, `sort`; размер страницы ограничен 100. Пакет отклоняется целиком при невалидном DTO или отсутствующем сервере/источнике. Временные границы и диапазон мощности проверяются до запроса.
+
+
+Статусы и переходы задокументированы в [`docs/architecture/monitoring-statuses.md`](../../docs/architecture/monitoring-statuses.md).

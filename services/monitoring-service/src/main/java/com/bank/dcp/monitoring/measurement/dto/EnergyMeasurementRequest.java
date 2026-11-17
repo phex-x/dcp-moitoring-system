@@ -5,6 +5,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import java.math.BigDecimal;
@@ -18,6 +19,7 @@ public record EnergyMeasurementRequest(
         @NotNull
         UUID sourceId,
         @NotNull
+        @PastOrPresent
         Instant measuredAt,
         @NotNull
         @DecimalMin("0.0")
@@ -30,6 +32,8 @@ public record EnergyMeasurementRequest(
         @DecimalMin("0.0")
         @DecimalMax("100.0")
         BigDecimal memoryUsagePct,
+        @DecimalMin("-50.0")
+        @DecimalMax("150.0")
         BigDecimal temperatureC,
         @NotNull
         MeasurementQualityStatus qualityStatus,

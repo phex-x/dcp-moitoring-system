@@ -1,6 +1,8 @@
 package com.bank.dcp.monitoring.datacenter.service;
 
 import com.bank.dcp.monitoring.common.PageableValidator;
+import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
+import com.bank.dcp.monitoring.common.exception.BusinessRuleViolationException;
 import com.bank.dcp.monitoring.common.exception.ResourceNotFoundException;
 import com.bank.dcp.monitoring.datacenter.dto.RackPatchRequest;
 import com.bank.dcp.monitoring.datacenter.dto.RackRequest;
@@ -56,6 +58,9 @@ public class RackService {
     @Transactional
     public RackResponse patch(UUID id, RackPatchRequest request) {
         Rack rack = getRackById(id);
+        if (Objects.nonNull(request.status()) && !rack.getStatus().canTransitionTo(request.status())) {
+            throw new BusinessRuleViolationException("Invalid InfrastructureStatus transition");
+        }
         DataCenter dataCenter = Objects.isNull(request.dataCenterId())
                 ? null
                 : getDataCenterById(request.dataCenterId());
@@ -68,6 +73,9 @@ public class RackService {
     @Transactional
     public void deactivate(UUID id) {
         Rack rack = getRackById(id);
+        if (!rack.getStatus().canTransitionTo(InfrastructureStatus.INACTIVE)) {
+            throw new BusinessRuleViolationException("Decommissioned infrastructure cannot be deactivated");
+        }
         mapper.deactivate(rack);
         repository.saveAndFlush(rack);
     }

@@ -30,12 +30,12 @@ public class MeasurementController {
     private final MeasurementService measurementService;
 
     @GetMapping
-    public Page<EnergyMeasurementResponse> list(@ModelAttribute MeasurementFilter filter, @PageableDefault(size = 50) Pageable pageable) {
+    public Page<EnergyMeasurementResponse> list(@Valid @ModelAttribute MeasurementFilter filter, @PageableDefault(size = 50) Pageable pageable) {
         return measurementService.list(filter, pageable);
     }
 
     @GetMapping("/series")
-    public Page<MeasurementSeriesPointResponse> series(@ModelAttribute MeasurementFilter filter, @PageableDefault(size = 100) Pageable pageable) {
+    public Page<MeasurementSeriesPointResponse> series(@Valid @ModelAttribute MeasurementFilter filter, @PageableDefault(size = 100) Pageable pageable) {
         return measurementService.series(filter, pageable);
     }
 
