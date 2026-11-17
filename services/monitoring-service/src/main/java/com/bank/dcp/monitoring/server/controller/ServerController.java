@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.server.controller;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.server.dto.ServerPatchRequest;
 import com.bank.dcp.monitoring.server.dto.ServerRequest;
 import com.bank.dcp.monitoring.server.dto.ServerResponse;
@@ -22,17 +23,17 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/servers")
+@RequestMapping(Constants.Api.SERVERS)
 @RequiredArgsConstructor
 public class ServerController {
     private final ServerService serverService;
 
     @GetMapping
-    public Page<ServerResponse> list(@PageableDefault(size = 20) Pageable pageable) {
+    public Page<ServerResponse> list(@PageableDefault(size = Constants.Pagination.DEFAULT_PAGE_SIZE) Pageable pageable) {
         return serverService.list(pageable);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(Constants.Api.RESOURCE_ID)
     public ServerResponse getById(@PathVariable UUID id) {
         return serverService.getById(id);
     }
@@ -43,12 +44,12 @@ public class ServerController {
         return serverService.create(request);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping(Constants.Api.RESOURCE_ID)
     public ServerResponse patch(@PathVariable UUID id, @Valid @RequestBody ServerPatchRequest request) {
         return serverService.patch(id, request);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(Constants.Api.RESOURCE_ID)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deactivate(@PathVariable UUID id) {
         serverService.deactivate(id);

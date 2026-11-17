@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.measurement.service;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.common.PageableValidator;
 import com.bank.dcp.monitoring.common.exception.InvalidRequestException;
 import com.bank.dcp.monitoring.common.exception.ResourceNotFoundException;
@@ -47,13 +48,13 @@ public class MeasurementService {
         validateFilter(filter);
         Pageable safePageable = PageableValidator.validate(
                 pageable,
-                "measuredAt",
-                "measuredAt",
-                "powerW",
-                "energyIntervalKwh",
-                "cpuLoadPct",
-                "qualityStatus",
-                "createdAt"
+                Constants.SortFields.MEASURED_AT,
+                Constants.SortFields.MEASURED_AT,
+                Constants.SortFields.POWER_W,
+                Constants.SortFields.ENERGY_INTERVAL_KWH,
+                Constants.SortFields.CPU_LOAD_PCT,
+                Constants.SortFields.QUALITY_STATUS,
+                Constants.SortFields.CREATED_AT
         );
 
         return measurementRepository.findAll(MeasurementSpecifications.byFilter(filter), safePageable)
@@ -64,17 +65,17 @@ public class MeasurementService {
         validateFilter(filter);
         Pageable safePageable = PageableValidator.validate(
                 pageable,
-                "measuredAt",
-                "measuredAt",
-                "powerW",
-                "energyIntervalKwh",
-                "cpuLoadPct",
-                "qualityStatus"
+                Constants.SortFields.MEASURED_AT,
+                Constants.SortFields.MEASURED_AT,
+                Constants.SortFields.POWER_W,
+                Constants.SortFields.ENERGY_INTERVAL_KWH,
+                Constants.SortFields.CPU_LOAD_PCT,
+                Constants.SortFields.QUALITY_STATUS
         );
         Pageable chronologicalPage = PageRequest.of(
                 safePageable.getPageNumber(),
                 safePageable.getPageSize(),
-                Sort.by(Sort.Direction.ASC, "measuredAt")
+                Sort.by(Sort.Direction.ASC, Constants.SortFields.MEASURED_AT)
         );
 
         return measurementRepository.findAll(MeasurementSpecifications.byFilter(filter), chronologicalPage)
@@ -83,7 +84,7 @@ public class MeasurementService {
 
     public EnergyMeasurementResponse getById(UUID id) {
         EnergyMeasurement measurement = measurementRepository.getEnergyMeasurementById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Energy measurement", id));
+                .orElseThrow(() -> new ResourceNotFoundException(Constants.ResourceNames.MEASUREMENT, id));
 
         return measurementMapper.toResponse(measurement);
     }
@@ -138,12 +139,12 @@ public class MeasurementService {
     ) {
         Server server = serversById.get(request.serverId());
         if (Objects.isNull(server)) {
-            throw new ResourceNotFoundException("Server", request.serverId());
+            throw new ResourceNotFoundException(Constants.ResourceNames.SERVER, request.serverId());
         }
 
         MeasurementSource source = sourcesById.get(request.sourceId());
         if (Objects.isNull(source)) {
-            throw new ResourceNotFoundException("Measurement source", request.sourceId());
+            throw new ResourceNotFoundException(Constants.ResourceNames.SOURCE, request.sourceId());
         }
 
         return measurementMapper.toEntity(request, server, source);
@@ -151,17 +152,17 @@ public class MeasurementService {
 
     private Server getServerById(UUID id) {
         return serverRepository.getServerById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Server", id));
+                .orElseThrow(() -> new ResourceNotFoundException(Constants.ResourceNames.SERVER, id));
     }
 
     private MeasurementSource getSourceById(UUID id) {
         return sourceRepository.getMeasurementSourceById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Measurement source", id));
+                .orElseThrow(() -> new ResourceNotFoundException(Constants.ResourceNames.SOURCE, id));
     }
 
     private void validateFilter(MeasurementFilter filter) {
         if (Objects.nonNull(filter.from()) && Objects.nonNull(filter.to()) && filter.from().isAfter(filter.to())) {
-            throw new InvalidRequestException("The from timestamp must be before or equal to the to timestamp");
+            throw new InvalidRequestException(Constants.Messages.INVALID_TIME_RANGE);
         }
 
         BigDecimal minimumPower = filter.minPower();
@@ -169,7 +170,7 @@ public class MeasurementService {
         if (Objects.nonNull(minimumPower)
                 && Objects.nonNull(maximumPower)
                 && minimumPower.compareTo(maximumPower) > 0) {
-            throw new InvalidRequestException("minPower must be less than or equal to maxPower");
+            throw new InvalidRequestException(Constants.Messages.INVALID_POWER_RANGE);
         }
     }
 }

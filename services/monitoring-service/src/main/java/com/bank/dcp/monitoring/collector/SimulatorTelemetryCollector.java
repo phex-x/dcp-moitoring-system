@@ -1,5 +1,7 @@
 package com.bank.dcp.monitoring.collector;
 
+import com.bank.dcp.monitoring.common.Constants;
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import com.bank.dcp.monitoring.common.enums.MeasurementQualityStatus;
 import com.bank.dcp.monitoring.common.enums.MeasurementSourceType;
@@ -20,13 +22,12 @@ import java.util.stream.IntStream;
 @Component
 @RequiredArgsConstructor
 public class SimulatorTelemetryCollector implements TelemetryCollector {
-    private static final int DEFAULT_INTERVAL_SECONDS = 60;
     private final ServerRepository serverRepository;
 
     @Override
     public List<EnergyMeasurement> collect(MeasurementSource source, int samplesPerServer) {
         if (source.getType() != MeasurementSourceType.SIMULATOR) {
-            throw new UnsupportedOperationException("Only SIMULATOR sources are supported by this collector");
+            throw new UnsupportedOperationException(Constants.Messages.UNSUPPORTED_SIMULATOR_SOURCE);
         }
 
         List<Server> servers = serverRepository.getAllByDataCenterIdAndStatus(
@@ -34,7 +35,7 @@ public class SimulatorTelemetryCollector implements TelemetryCollector {
                 InfrastructureStatus.ACTIVE
         );
         int intervalSeconds = Objects.isNull(source.getPollIntervalSec())
-                ? DEFAULT_INTERVAL_SECONDS
+                ? Constants.Simulator.DEFAULT_INTERVAL_SECONDS
                 : source.getPollIntervalSec();
 
         return servers.stream()
@@ -50,10 +51,17 @@ public class SimulatorTelemetryCollector implements TelemetryCollector {
             int sample
     ) {
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        BigDecimal powerW = decimal(random.nextDouble(120.0, 650.0), 3);
+        BigDecimal powerW = decimal(random.nextDouble(
+                Constants.Simulator.MIN_POWER_W,
+                Constants.Simulator.MAX_POWER_W
+        ), Constants.Simulator.POWER_SCALE);
         BigDecimal energyKwh = powerW
                 .multiply(BigDecimal.valueOf(intervalSeconds))
-                .divide(BigDecimal.valueOf(3_600_000), 6, RoundingMode.HALF_UP);
+                .divide(
+                        BigDecimal.valueOf(Constants.Simulator.ENERGY_CONVERSION_MILLISECONDS_PER_HOUR),
+                        Constants.Simulator.ENERGY_SCALE,
+                        RoundingMode.HALF_UP
+                );
 
         return EnergyMeasurement.builder()
                 .server(server)
@@ -61,9 +69,18 @@ public class SimulatorTelemetryCollector implements TelemetryCollector {
                 .measuredAt(Instant.now().minusSeconds((long) sample * intervalSeconds))
                 .powerW(powerW)
                 .energyIntervalKwh(energyKwh)
-                .cpuLoadPct(decimal(random.nextDouble(5.0, 95.0), 2))
-                .memoryUsagePct(decimal(random.nextDouble(10.0, 90.0), 2))
-                .temperatureC(decimal(random.nextDouble(20.0, 75.0), 2))
+                .cpuLoadPct(decimal(random.nextDouble(
+                        Constants.Simulator.MIN_CPU_LOAD_PCT,
+                        Constants.Simulator.MAX_CPU_LOAD_PCT
+                ), Constants.Simulator.METRIC_SCALE))
+                .memoryUsagePct(decimal(random.nextDouble(
+                        Constants.Simulator.MIN_MEMORY_USAGE_PCT,
+                        Constants.Simulator.MAX_MEMORY_USAGE_PCT
+                ), Constants.Simulator.METRIC_SCALE))
+                .temperatureC(decimal(random.nextDouble(
+                        Constants.Simulator.MIN_TEMPERATURE_C,
+                        Constants.Simulator.MAX_TEMPERATURE_C
+                ), Constants.Simulator.METRIC_SCALE))
                 .qualityStatus(MeasurementQualityStatus.VALID)
                 .build();
     }

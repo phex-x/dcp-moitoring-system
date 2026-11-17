@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.source.dto;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.common.enums.MeasurementSourceStatus;
 import com.bank.dcp.monitoring.common.enums.MeasurementSourceType;
 import jakarta.validation.constraints.Min;
@@ -11,13 +12,13 @@ import java.util.UUID;
 @Builder
 public record MeasurementSourcePatchRequest(
         UUID dataCenterId,
-        @Size(max = 150)
+        @Size(max = Constants.Validation.MAX_NAME_LENGTH)
         String name,
         MeasurementSourceType type,
-        @Size(max = 500)
+        @Size(max = Constants.Validation.MAX_DESCRIPTION_LENGTH)
         String endpoint,
         MeasurementSourceStatus status,
-        @Min(1)
-        @Max(86400)
+        @Min(Constants.Validation.MIN_POLL_INTERVAL_SECONDS)
+        @Max(Constants.Validation.MAX_POLL_INTERVAL_SECONDS)
         Integer pollIntervalSec
 ) {}

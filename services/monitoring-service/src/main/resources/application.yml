@@ -3,6 +3,8 @@ server:
 spring:
   application:
     name: monitoring-service
+  messages:
+    basename: messages
   datasource:
     url: ${MONITORING_DB_URL:jdbc:postgresql://localhost:5432/monitoring_db}
     username: ${MONITORING_DB_USERNAME:dcp}

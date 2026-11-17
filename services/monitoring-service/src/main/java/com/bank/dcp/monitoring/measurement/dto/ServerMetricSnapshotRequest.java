@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.measurement.dto;
 
+import com.bank.dcp.monitoring.common.Constants;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -15,18 +16,18 @@ public record ServerMetricSnapshotRequest(
         @NotNull
         @PastOrPresent
         Instant capturedAt,
-        @DecimalMin("0.0")
-        @DecimalMax("100.0")
+        @DecimalMin(Constants.Validation.MIN_NON_NEGATIVE)
+        @DecimalMax(Constants.Validation.MAX_PERCENT)
         BigDecimal cpuLoadPct,
-        @DecimalMin("0.0")
-        @DecimalMax("100.0")
+        @DecimalMin(Constants.Validation.MIN_NON_NEGATIVE)
+        @DecimalMax(Constants.Validation.MAX_PERCENT)
         BigDecimal memoryUsagePct,
-        @DecimalMin("-50.0")
-        @DecimalMax("150.0")
+        @DecimalMin(Constants.Validation.MIN_TEMPERATURE)
+        @DecimalMax(Constants.Validation.MAX_TEMPERATURE)
         BigDecimal temperatureC,
-        @DecimalMin("0.0")
+        @DecimalMin(Constants.Validation.MIN_NON_NEGATIVE)
         BigDecimal networkInMbps,
-        @DecimalMin("0.0")
+        @DecimalMin(Constants.Validation.MIN_NON_NEGATIVE)
         BigDecimal networkOutMbps
 ) {
 }

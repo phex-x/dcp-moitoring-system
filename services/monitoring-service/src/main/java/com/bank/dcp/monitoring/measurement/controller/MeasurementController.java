@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.measurement.controller;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.measurement.dto.EnergyMeasurementRequest;
 import com.bank.dcp.monitoring.measurement.dto.EnergyMeasurementResponse;
 import com.bank.dcp.monitoring.measurement.dto.MeasurementBulkRequest;
@@ -24,22 +25,22 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/measurements")
+@RequestMapping(Constants.Api.MEASUREMENTS)
 @RequiredArgsConstructor
 public class MeasurementController {
     private final MeasurementService measurementService;
 
     @GetMapping
-    public Page<EnergyMeasurementResponse> list(@Valid @ModelAttribute MeasurementFilter filter, @PageableDefault(size = 50) Pageable pageable) {
+    public Page<EnergyMeasurementResponse> list(@Valid @ModelAttribute MeasurementFilter filter, @PageableDefault(size = Constants.Pagination.MEASUREMENT_PAGE_SIZE) Pageable pageable) {
         return measurementService.list(filter, pageable);
     }
 
-    @GetMapping("/series")
-    public Page<MeasurementSeriesPointResponse> series(@Valid @ModelAttribute MeasurementFilter filter, @PageableDefault(size = 100) Pageable pageable) {
+    @GetMapping(Constants.Api.SERIES)
+    public Page<MeasurementSeriesPointResponse> series(@Valid @ModelAttribute MeasurementFilter filter, @PageableDefault(size = Constants.Pagination.SERIES_PAGE_SIZE) Pageable pageable) {
         return measurementService.series(filter, pageable);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(Constants.Api.RESOURCE_ID)
     public EnergyMeasurementResponse getById(@PathVariable UUID id) {
         return measurementService.getById(id);
     }
@@ -50,7 +51,7 @@ public class MeasurementController {
         return measurementService.create(request);
     }
 
-    @PostMapping("/bulk")
+    @PostMapping(Constants.Api.BULK)
     @ResponseStatus(HttpStatus.CREATED)
     public MeasurementBulkResponse createBulk(@Valid @RequestBody MeasurementBulkRequest request) {
         return measurementService.createBulk(request);

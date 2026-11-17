@@ -10,13 +10,14 @@ public final class PageableValidator {
     private PageableValidator() {}
 
     public static Pageable validate(Pageable pageable, String defaultSort, String... allowedSorts) {
-        if (pageable.getPageSize() < 1 || pageable.getPageSize() > 100) {
-            throw new InvalidRequestException("Page size must be between 1 and 100");
+        if (pageable.getPageSize() < Constants.Pagination.MIN_PAGE_SIZE
+                || pageable.getPageSize() > Constants.Pagination.MAX_PAGE_SIZE) {
+            throw new InvalidRequestException(Constants.Messages.INVALID_PAGE_SIZE);
         }
         Set<String> allowed = Set.of(allowedSorts);
         for (Sort.Order order : pageable.getSort()) {
             if (!allowed.contains(order.getProperty())) {
-                throw new InvalidRequestException("Unsupported sort field: " + order.getProperty());
+                throw new InvalidRequestException(Constants.Messages.UNSUPPORTED_SORT_FIELD + order.getProperty());
             }
         }
         Sort sort = pageable.getSort().isSorted() ? pageable.getSort() : Sort.by(defaultSort).ascending();

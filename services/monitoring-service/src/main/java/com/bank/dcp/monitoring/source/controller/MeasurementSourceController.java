@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.source.controller;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.collector.dto.CollectorJobResponse;
 import com.bank.dcp.monitoring.collector.dto.CollectorSyncRequest;
 import com.bank.dcp.monitoring.source.dto.MeasurementSourcePatchRequest;
@@ -25,17 +26,17 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/sources")
+@RequestMapping(Constants.Api.SOURCES)
 @RequiredArgsConstructor
 public class MeasurementSourceController {
     private final MeasurementSourceService measurementSourceService;
 
     @GetMapping
-    public Page<MeasurementSourceResponse> list(@PageableDefault(size = 20) Pageable pageable) {
+    public Page<MeasurementSourceResponse> list(@PageableDefault(size = Constants.Pagination.DEFAULT_PAGE_SIZE) Pageable pageable) {
         return measurementSourceService.list(pageable);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(Constants.Api.RESOURCE_ID)
     public MeasurementSourceResponse getById(@PathVariable UUID id) {
         return measurementSourceService.getById(id);
     }
@@ -46,23 +47,23 @@ public class MeasurementSourceController {
         return measurementSourceService.create(request);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping(Constants.Api.RESOURCE_ID)
     public MeasurementSourceResponse patch(@PathVariable UUID id, @Valid @RequestBody MeasurementSourcePatchRequest request) {
         return measurementSourceService.patch(id, request);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(Constants.Api.RESOURCE_ID)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deactivate(@PathVariable UUID id) {
         measurementSourceService.deactivate(id);
     }
 
-    @PostMapping("/{id}/test")
+    @PostMapping(Constants.Api.SOURCE_TEST)
     public SourceAvailabilityResponse test(@PathVariable UUID id) {
         return measurementSourceService.test(id);
     }
 
-    @PostMapping("/{id}/sync")
+    @PostMapping(Constants.Api.SOURCE_SYNC)
     public CollectorJobResponse synchronize(@PathVariable UUID id, @Valid @RequestBody(required = false) CollectorSyncRequest request) {
         return measurementSourceService.synchronize(id, request);
     }

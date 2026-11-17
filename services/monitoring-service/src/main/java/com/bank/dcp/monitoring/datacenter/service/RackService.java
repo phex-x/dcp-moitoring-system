@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.datacenter.service;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.common.PageableValidator;
 import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import com.bank.dcp.monitoring.common.exception.BusinessRuleViolationException;
@@ -32,11 +33,11 @@ public class RackService {
     public Page<RackResponse> list(Pageable pageable) {
         Pageable safePageable = PageableValidator.validate(
                 pageable,
-                "code",
-                "code",
-                "name",
-                "status",
-                "createdAt"
+                Constants.SortFields.CODE,
+                Constants.SortFields.CODE,
+                Constants.SortFields.NAME,
+                Constants.SortFields.STATUS,
+                Constants.SortFields.CREATED_AT
         );
 
         return repository.findAll(safePageable).map(mapper::toResponse);
@@ -59,7 +60,7 @@ public class RackService {
     public RackResponse patch(UUID id, RackPatchRequest request) {
         Rack rack = getRackById(id);
         if (Objects.nonNull(request.status()) && !rack.getStatus().canTransitionTo(request.status())) {
-            throw new BusinessRuleViolationException("Invalid InfrastructureStatus transition");
+            throw new BusinessRuleViolationException(Constants.Messages.INVALID_INFRASTRUCTURE_STATUS_TRANSITION);
         }
         DataCenter dataCenter = Objects.isNull(request.dataCenterId())
                 ? null
@@ -74,7 +75,7 @@ public class RackService {
     public void deactivate(UUID id) {
         Rack rack = getRackById(id);
         if (!rack.getStatus().canTransitionTo(InfrastructureStatus.INACTIVE)) {
-            throw new BusinessRuleViolationException("Decommissioned infrastructure cannot be deactivated");
+            throw new BusinessRuleViolationException(Constants.Messages.DECOMMISSIONED_INFRASTRUCTURE_DEACTIVATION);
         }
         mapper.deactivate(rack);
         repository.saveAndFlush(rack);
@@ -82,11 +83,11 @@ public class RackService {
 
     private Rack getRackById(UUID id) {
         return repository.getRackById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Rack", id));
+                .orElseThrow(() -> new ResourceNotFoundException(Constants.ResourceNames.RACK, id));
     }
 
     private DataCenter getDataCenterById(UUID id) {
         return dataCenterRepository.getDataCenterById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Data center", id));
+                .orElseThrow(() -> new ResourceNotFoundException(Constants.ResourceNames.DATA_CENTER, id));
     }
 }

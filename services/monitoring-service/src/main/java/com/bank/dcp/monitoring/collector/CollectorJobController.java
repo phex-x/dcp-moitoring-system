@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.collector;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.collector.dto.CollectorJobResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,13 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/collector/jobs")
+@RequestMapping(Constants.Api.COLLECTOR_JOBS)
 @RequiredArgsConstructor
 public class CollectorJobController {
     private final CollectorJobService collectorJobService;
 
     @GetMapping
-    public Page<CollectorJobResponse> list(@RequestParam(required = false) UUID sourceId, @PageableDefault(size = 20) Pageable pageable) {
+    public Page<CollectorJobResponse> list(@RequestParam(required = false) UUID sourceId, @PageableDefault(size = Constants.Pagination.DEFAULT_PAGE_SIZE) Pageable pageable) {
         return collectorJobService.list(sourceId, pageable);
     }
 }

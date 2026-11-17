@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.datacenter.dto;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.DecimalMin;
@@ -10,16 +11,16 @@ import java.math.BigDecimal;
 
 @Builder
 public record DataCenterPatchRequest(
-        @Size(max = 32)
+        @Size(max = Constants.Validation.MAX_CODE_LENGTH)
         String code,
-        @Size(max = 150)
+        @Size(max = Constants.Validation.MAX_NAME_LENGTH)
         String name,
-        @Size(max = 255)
+        @Size(max = Constants.Validation.MAX_LOCATION_LENGTH)
         String location,
-        @Size(max = 64)
+        @Size(max = Constants.Validation.MAX_TIMEZONE_LENGTH)
         String timezone,
-        @DecimalMin("1.0")
-        @DecimalMax("10.0")
+        @DecimalMin(Constants.Validation.MIN_PUE)
+        @DecimalMax(Constants.Validation.MAX_PUE)
         BigDecimal pueTarget,
         InfrastructureStatus status
 ) {}

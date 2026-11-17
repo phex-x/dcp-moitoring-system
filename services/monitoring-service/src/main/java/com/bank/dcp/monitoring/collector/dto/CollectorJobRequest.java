@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.collector.dto;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.common.enums.CollectorJobStatus;
 import com.bank.dcp.monitoring.common.validation.ValidCollectorJobTimeRange;
 import jakarta.validation.constraints.Min;
@@ -18,11 +19,11 @@ public record CollectorJobRequest(
         Instant startedAt,
         @PastOrPresent
         Instant finishedAt,
-        @Min(0)
+        @Min(Constants.Validation.MIN_NON_NEGATIVE_COUNT)
         Long recordsReceived,
-        @Min(0)
+        @Min(Constants.Validation.MIN_NON_NEGATIVE_COUNT)
         Long recordsSaved,
-        @Min(0)
+        @Min(Constants.Validation.MIN_NON_NEGATIVE_COUNT)
         Long recordsRejected,
         @NotNull
         CollectorJobStatus status,

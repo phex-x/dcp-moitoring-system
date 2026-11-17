@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.collector;
 
+import com.bank.dcp.monitoring.common.Constants;
 import com.bank.dcp.monitoring.common.PageableValidator;
 import com.bank.dcp.monitoring.collector.dto.CollectorJobResponse;
 import com.bank.dcp.monitoring.collector.mapper.CollectorJobMapper;
@@ -22,10 +23,10 @@ public class CollectorJobService {
     public Page<CollectorJobResponse> list(UUID sourceId, Pageable pageable) {
         Pageable safePageable = PageableValidator.validate(
                 pageable,
-                "startedAt",
-                "startedAt",
-                "finishedAt",
-                "status"
+                Constants.SortFields.STARTED_AT,
+                Constants.SortFields.STARTED_AT,
+                Constants.SortFields.FINISHED_AT,
+                Constants.SortFields.STATUS
         );
 
         if (Objects.nonNull(sourceId)) {
