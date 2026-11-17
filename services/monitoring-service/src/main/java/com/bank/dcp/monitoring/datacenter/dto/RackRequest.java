@@ -5,10 +5,10 @@ import java.util.UUID;
 
 @lombok.Builder
 public record RackRequest(
-        UUID dataCenterId,
-        String code,
-        String name,
-        BigDecimal powerCapacityW,
-        String status
+        @jakarta.validation.constraints.NotNull UUID dataCenterId,
+        @jakarta.validation.constraints.NotBlank @jakarta.validation.constraints.Size(max = 32) String code,
+        @jakarta.validation.constraints.NotBlank @jakarta.validation.constraints.Size(max = 150) String name,
+        @jakarta.validation.constraints.DecimalMin("0.0") BigDecimal powerCapacityW,
+        @jakarta.validation.constraints.NotBlank @jakarta.validation.constraints.Size(max = 20) String status
 ) {
 }

@@ -6,15 +6,15 @@ import java.util.UUID;
 
 @lombok.Builder
 public record ServerRequest(
-        UUID rackId,
-        String hostname,
-        String assetTag,
-        String vendor,
-        String model,
-        Integer cpuCores,
-        BigDecimal ramGb,
-        BigDecimal ratedPowerW,
-        String status,
+        @jakarta.validation.constraints.NotNull UUID rackId,
+        @jakarta.validation.constraints.NotBlank @jakarta.validation.constraints.Size(max = 120) String hostname,
+        @jakarta.validation.constraints.NotBlank @jakarta.validation.constraints.Size(max = 64) String assetTag,
+        @jakarta.validation.constraints.Size(max = 100) String vendor,
+        @jakarta.validation.constraints.Size(max = 100) String model,
+        @jakarta.validation.constraints.Positive Integer cpuCores,
+        @jakarta.validation.constraints.DecimalMin("0.0") BigDecimal ramGb,
+        @jakarta.validation.constraints.DecimalMin("0.0") BigDecimal ratedPowerW,
+        @jakarta.validation.constraints.NotBlank @jakarta.validation.constraints.Size(max = 20) String status,
         Instant installedAt
 ) {
 }
