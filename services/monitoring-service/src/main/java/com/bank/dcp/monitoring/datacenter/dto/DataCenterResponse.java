@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.datacenter.dto;
 
+import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
@@ -12,7 +13,7 @@ public record DataCenterResponse(
         String location,
         String timezone,
         BigDecimal pueTarget,
-        String status,
+        InfrastructureStatus status,
         Instant createdAt,
         Instant updatedAt
 ) {

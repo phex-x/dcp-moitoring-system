@@ -1,6 +1,7 @@
 package com.bank.dcp.monitoring.collector.entity;
 
 import jakarta.persistence.*;
+import com.bank.dcp.monitoring.common.enums.CollectorJobStatus;
 import java.time.Instant;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -34,8 +35,9 @@ public class CollectorJob {
     private Long recordsSaved;
     @Column(name="records_rejected")
     private Long recordsRejected;
+    @Enumerated(EnumType.STRING)
     @Column(name="status", length = 20, nullable = false)
-    private String status;
+    private CollectorJobStatus status;
     @Column(name="error_message", columnDefinition = "text")
     private String errorMessage;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
