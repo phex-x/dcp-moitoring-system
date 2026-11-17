@@ -1,10 +1,16 @@
 databaseChangeLog:
-  # Каждая схема Monitoring Service изменяется отдельной версионируемой миграцией.
-  # Первый changeset предметной модели будет добавлен вместе с доменной feature.
   - changeSet:
-      id: 000-create-service-schema
-      author: dcp-team
+      id: 001-create-monitoring-domain
+      author: Dmitriy Serov
       changes:
-        - sql:
-            comment: Инициализирует схему миграций сервиса без предметных таблиц.
-            sql: SELECT 1
+        - sqlFile:
+            path: sql/migration/001-create-monitoring-domain.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true
+      rollback:
+        - sqlFile:
+            path: sql/rollback/001-create-monitoring-domain-rollback.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true
