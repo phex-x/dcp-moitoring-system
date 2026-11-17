@@ -1,6 +1,7 @@
 package com.bank.dcp.monitoring.datacenter.service;
 
 import com.bank.dcp.monitoring.common.PageableValidator;
+import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import com.bank.dcp.monitoring.common.exception.ResourceNotFoundException;
 import com.bank.dcp.monitoring.datacenter.dto.DataCenterPatchRequest;
 import com.bank.dcp.monitoring.datacenter.dto.DataCenterRequest;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -23,35 +25,67 @@ public class DataCenterService {
     private final DataCenterMapper mapper;
 
     public Page<DataCenterResponse> list(Pageable pageable) {
-        Pageable safePageable = PageableValidator.validate(pageable, "name", "code", "name", "location", "status", "createdAt");
+        Pageable safePageable = PageableValidator.validate(
+                pageable,
+                "name",
+                "code",
+                "name",
+                "location",
+                "status",
+                "createdAt"
+        );
+
         return repository.findAll(safePageable).map(mapper::toResponse);
     }
 
-    public DataCenterResponse get(UUID id) { return mapper.toResponse(find(id)); }
+    public DataCenterResponse getById(UUID id) {
+        return mapper.toResponse(getDataCenterById(id));
+    }
 
     @Transactional
     public DataCenterResponse create(DataCenterRequest request) {
-        return mapper.toResponse(repository.saveAndFlush(mapper.toEntity(request)));
+        DataCenter entity = mapper.toEntity(request);
+        DataCenter savedEntity = repository.saveAndFlush(entity);
+
+        return mapper.toResponse(savedEntity);
     }
 
     @Transactional
     public DataCenterResponse patch(UUID id, DataCenterPatchRequest request) {
-        DataCenter entity = find(id);
-        if (request.code() != null) entity.setCode(request.code());
-        if (request.name() != null) entity.setName(request.name());
-        if (request.location() != null) entity.setLocation(request.location());
-        if (request.timezone() != null) entity.setTimezone(request.timezone());
-        if (request.pueTarget() != null) entity.setPueTarget(request.pueTarget());
-        if (request.status() != null) entity.setStatus(request.status());
-        return mapper.toResponse(repository.saveAndFlush(entity));
+        DataCenter entity = getDataCenterById(id);
+
+        if (Objects.nonNull(request.code())) {
+            entity.setCode(request.code());
+        }
+        if (Objects.nonNull(request.name())) {
+            entity.setName(request.name());
+        }
+        if (Objects.nonNull(request.location())) {
+            entity.setLocation(request.location());
+        }
+        if (Objects.nonNull(request.timezone())) {
+            entity.setTimezone(request.timezone());
+        }
+        if (Objects.nonNull(request.pueTarget())) {
+            entity.setPueTarget(request.pueTarget());
+        }
+        if (Objects.nonNull(request.status())) {
+            entity.setStatus(request.status());
+        }
+
+        DataCenter savedEntity = repository.saveAndFlush(entity);
+        return mapper.toResponse(savedEntity);
     }
 
     @Transactional
     public void deactivate(UUID id) {
-        DataCenter entity = find(id);
-        entity.setStatus("INACTIVE");
+        DataCenter entity = getDataCenterById(id);
+        entity.setStatus(InfrastructureStatus.INACTIVE);
         repository.saveAndFlush(entity);
     }
 
-    private DataCenter find(UUID id) { return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Data center", id)); }
+    private DataCenter getDataCenterById(UUID id) {
+        return repository.getDataCenterById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Data center", id));
+    }
 }

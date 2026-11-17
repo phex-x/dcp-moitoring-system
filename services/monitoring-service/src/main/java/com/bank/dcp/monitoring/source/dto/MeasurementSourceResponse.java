@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.source.dto;
 
+import com.bank.dcp.monitoring.common.enums.MeasurementSourceStatus;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -10,7 +11,7 @@ public record MeasurementSourceResponse(
         String name,
         String type,
         String endpoint,
-        String status,
+        MeasurementSourceStatus status,
         Integer pollIntervalSec,
         Instant lastSuccessAt,
         Instant lastErrorAt,

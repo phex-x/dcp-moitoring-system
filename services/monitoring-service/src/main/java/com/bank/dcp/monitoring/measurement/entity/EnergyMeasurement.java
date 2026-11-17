@@ -1,6 +1,8 @@
 package com.bank.dcp.monitoring.measurement.entity;
 
 import jakarta.persistence.*;
+import com.bank.dcp.monitoring.common.enums.MeasurementQualityStatus;
+import com.bank.dcp.monitoring.common.enums.MeasurementQualityStatus;
 import java.time.Instant;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -43,8 +45,9 @@ public class EnergyMeasurement {
     private BigDecimal memoryUsagePct;
     @Column(name="temperature_c")
     private BigDecimal temperatureC;
-    @Column(name="quality_status", length = 20)
-    private String qualityStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "quality_status", length = 20, nullable = false)
+    private MeasurementQualityStatus qualityStatus;
     @Column(name="checksum", length = 64)
     private String checksum;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

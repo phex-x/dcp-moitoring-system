@@ -1,6 +1,7 @@
 package com.bank.dcp.monitoring.datacenter.service;
 
 import com.bank.dcp.monitoring.common.PageableValidator;
+import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import com.bank.dcp.monitoring.common.exception.ResourceNotFoundException;
 import com.bank.dcp.monitoring.datacenter.dto.RackPatchRequest;
 import com.bank.dcp.monitoring.datacenter.dto.RackRequest;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -26,37 +28,69 @@ public class RackService {
     private final RackMapper mapper;
 
     public Page<RackResponse> list(Pageable pageable) {
-        Pageable safePageable = PageableValidator.validate(pageable, "code", "code", "name", "status", "createdAt");
+        Pageable safePageable = PageableValidator.validate(
+                pageable,
+                "code",
+                "code",
+                "name",
+                "status",
+                "createdAt"
+        );
+
         return repository.findAll(safePageable).map(mapper::toResponse);
     }
 
-    public RackResponse get(UUID id) { return mapper.toResponse(find(id)); }
+    public RackResponse getById(UUID id) {
+        return mapper.toResponse(getRackById(id));
+    }
 
     @Transactional
     public RackResponse create(RackRequest request) {
         Rack rack = mapper.toEntity(request);
-        rack.setDataCenter(findDataCenter(request.dataCenterId()));
-        return mapper.toResponse(repository.saveAndFlush(rack));
+        rack.setDataCenter(getDataCenterById(request.dataCenterId()));
+        Rack savedRack = repository.saveAndFlush(rack);
+
+        return mapper.toResponse(savedRack);
     }
 
     @Transactional
     public RackResponse patch(UUID id, RackPatchRequest request) {
-        Rack rack = find(id);
-        if (request.dataCenterId() != null) rack.setDataCenter(findDataCenter(request.dataCenterId()));
-        if (request.code() != null) rack.setCode(request.code());
-        if (request.name() != null) rack.setName(request.name());
-        if (request.powerCapacityW() != null) rack.setPowerCapacityW(request.powerCapacityW());
-        if (request.status() != null) rack.setStatus(request.status());
-        return mapper.toResponse(repository.saveAndFlush(rack));
+        Rack rack = getRackById(id);
+
+        if (Objects.nonNull(request.dataCenterId())) {
+            rack.setDataCenter(getDataCenterById(request.dataCenterId()));
+        }
+        if (Objects.nonNull(request.code())) {
+            rack.setCode(request.code());
+        }
+        if (Objects.nonNull(request.name())) {
+            rack.setName(request.name());
+        }
+        if (Objects.nonNull(request.powerCapacityW())) {
+            rack.setPowerCapacityW(request.powerCapacityW());
+        }
+        if (Objects.nonNull(request.status())) {
+            rack.setStatus(request.status());
+        }
+
+        Rack savedRack = repository.saveAndFlush(rack);
+        return mapper.toResponse(savedRack);
     }
 
     @Transactional
     public void deactivate(UUID id) {
-        Rack rack = find(id);
-        rack.setStatus("INACTIVE");
+        Rack rack = getRackById(id);
+        rack.setStatus(InfrastructureStatus.INACTIVE);
         repository.saveAndFlush(rack);
     }
 
-    private Rack find(UUID id) { return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Rack", id)); }
-    private DataCenter findDataCenter(UUID id) { return dataCenterRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Data center", id)); }
+    private Rack getRackById(UUID id) {
+        return repository.getRackById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Rack", id));
+    }
+
+    private DataCenter getDataCenterById(UUID id) {
+        return dataCenterRepository.getDataCenterById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Data center", id));
+    }
 }

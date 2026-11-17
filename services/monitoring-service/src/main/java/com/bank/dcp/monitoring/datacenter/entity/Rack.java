@@ -1,6 +1,7 @@
 package com.bank.dcp.monitoring.datacenter.entity;
 
 import jakarta.persistence.*;
+import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import java.time.Instant;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -39,15 +40,18 @@ public class Rack {
     }
 
     @PreUpdate
-    void onUpdate() { updatedAt = Instant.now(); }
+    void onUpdate() {
+        updatedAt = Instant.now();
+    }
     @Column(name="code", length = 32, nullable = false)
     private String code;
     @Column(name="name", length = 150, nullable = false)
     private String name;
     @Column(name="power_capacity_w")
     private BigDecimal powerCapacityW;
-    @Column(name="status", length = 20, nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 20, nullable = false)
+    private InfrastructureStatus status;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="data_center_id", nullable = false)
     private DataCenter dataCenter;
