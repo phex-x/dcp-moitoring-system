@@ -12,9 +12,10 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.IntStream;
 
 @Component
 @RequiredArgsConstructor
@@ -28,22 +29,18 @@ public class SimulatorTelemetryCollector implements TelemetryCollector {
             throw new UnsupportedOperationException("Only SIMULATOR sources are supported by this collector");
         }
 
-        List<Server> servers = serverRepository.getAllByRack_DataCenter_IdAndStatus(
+        List<Server> servers = serverRepository.getAllByDataCenterIdAndStatus(
                 source.getDataCenter().getId(),
                 InfrastructureStatus.ACTIVE
         );
-        List<EnergyMeasurement> measurements = new ArrayList<>();
-        int intervalSeconds = source.getPollIntervalSec() == null
+        int intervalSeconds = Objects.isNull(source.getPollIntervalSec())
                 ? DEFAULT_INTERVAL_SECONDS
                 : source.getPollIntervalSec();
 
-        for (Server server : servers) {
-            for (int sample = 0; sample < samplesPerServer; sample++) {
-                measurements.add(createMeasurement(source, server, intervalSeconds, sample));
-            }
-        }
-
-        return measurements;
+        return servers.stream()
+                .flatMap(server -> IntStream.range(0, samplesPerServer)
+                        .mapToObj(sample -> createMeasurement(source, server, intervalSeconds, sample)))
+                .toList();
     }
 
     private EnergyMeasurement createMeasurement(

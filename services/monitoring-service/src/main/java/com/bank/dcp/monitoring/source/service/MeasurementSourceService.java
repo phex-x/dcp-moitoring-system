@@ -3,7 +3,6 @@ package com.bank.dcp.monitoring.source.service;
 import com.bank.dcp.monitoring.common.PageableValidator;
 import com.bank.dcp.monitoring.common.enums.MeasurementSourceStatus;
 import com.bank.dcp.monitoring.common.enums.MeasurementSourceType;
-import com.bank.dcp.monitoring.common.enums.CollectorJobStatus;
 import com.bank.dcp.monitoring.common.exception.BusinessRuleViolationException;
 import com.bank.dcp.monitoring.common.exception.ResourceNotFoundException;
 import com.bank.dcp.monitoring.collector.dto.CollectorSyncRequest;
@@ -66,8 +65,8 @@ public class MeasurementSourceService {
 
     @Transactional
     public MeasurementSourceResponse create(MeasurementSourceRequest request) {
-        MeasurementSource source = sourceMapper.toEntity(request);
-        source.setDataCenter(getDataCenterById(request.dataCenterId()));
+        DataCenter dataCenter = getDataCenterById(request.dataCenterId());
+        MeasurementSource source = sourceMapper.toEntity(request, dataCenter);
         MeasurementSource savedSource = sourceRepository.saveAndFlush(source);
 
         return sourceMapper.toResponse(savedSource);
@@ -76,25 +75,10 @@ public class MeasurementSourceService {
     @Transactional
     public MeasurementSourceResponse patch(UUID id, MeasurementSourcePatchRequest request) {
         MeasurementSource source = getSourceById(id);
-
-        if (Objects.nonNull(request.dataCenterId())) {
-            source.setDataCenter(getDataCenterById(request.dataCenterId()));
-        }
-        if (Objects.nonNull(request.name())) {
-            source.setName(request.name());
-        }
-        if (Objects.nonNull(request.type())) {
-            source.setType(request.type());
-        }
-        if (Objects.nonNull(request.endpoint())) {
-            source.setEndpoint(request.endpoint());
-        }
-        if (Objects.nonNull(request.status())) {
-            source.setStatus(request.status());
-        }
-        if (Objects.nonNull(request.pollIntervalSec())) {
-            source.setPollIntervalSec(request.pollIntervalSec());
-        }
+        DataCenter dataCenter = Objects.isNull(request.dataCenterId())
+                ? null
+                : getDataCenterById(request.dataCenterId());
+        sourceMapper.patch(request, dataCenter, source);
 
         MeasurementSource savedSource = sourceRepository.saveAndFlush(source);
         return sourceMapper.toResponse(savedSource);
@@ -103,7 +87,7 @@ public class MeasurementSourceService {
     @Transactional
     public void deactivate(UUID id) {
         MeasurementSource source = getSourceById(id);
-        source.setStatus(MeasurementSourceStatus.INACTIVE);
+        sourceMapper.deactivate(source);
         sourceRepository.saveAndFlush(source);
     }
 
@@ -118,11 +102,9 @@ public class MeasurementSourceService {
                 : "Source is inactive or has no registered collector";
 
         if (available) {
-            source.setLastSuccessAt(checkedAt);
-            source.setLastError(null);
+            sourceMapper.recordProbeSuccess(source, checkedAt);
         } else {
-            source.setLastErrorAt(checkedAt);
-            source.setLastError(message);
+            sourceMapper.recordProbeFailure(source, checkedAt, message);
         }
         sourceRepository.saveAndFlush(source);
 
@@ -145,33 +127,19 @@ public class MeasurementSourceService {
                 ? DEFAULT_SAMPLES_PER_SERVER
                 : request.samplesPerServer();
         Instant startedAt = Instant.now();
-        CollectorJob job = CollectorJob.builder()
-                .source(source)
-                .startedAt(startedAt)
-                .status(CollectorJobStatus.RUNNING)
-                .recordsReceived(0L)
-                .recordsSaved(0L)
-                .recordsRejected(0L)
-                .build();
+        CollectorJob job = jobMapper.createStarted(source, startedAt);
         job = jobRepository.saveAndFlush(job);
 
         try {
             List<EnergyMeasurement> measurements = telemetryCollector.collect(source, samplesPerServer);
             measurementRepository.saveAll(measurements);
             Instant finishedAt = Instant.now();
-            job.setFinishedAt(finishedAt);
-            job.setRecordsReceived((long) measurements.size());
-            job.setRecordsSaved((long) measurements.size());
-            job.setStatus(CollectorJobStatus.SUCCEEDED);
-            source.setLastSuccessAt(finishedAt);
-            source.setLastError(null);
+            jobMapper.markSucceeded(job, finishedAt, measurements.size());
+            sourceMapper.recordSyncSuccess(source, finishedAt);
         } catch (RuntimeException exception) {
             Instant finishedAt = Instant.now();
-            job.setFinishedAt(finishedAt);
-            job.setStatus(CollectorJobStatus.FAILED);
-            job.setErrorMessage(exception.getMessage());
-            source.setLastErrorAt(finishedAt);
-            source.setLastError(exception.getMessage());
+            jobMapper.markFailed(job, finishedAt, exception.getMessage());
+            sourceMapper.recordSyncFailure(source, finishedAt, exception.getMessage());
         }
 
         sourceRepository.save(source);

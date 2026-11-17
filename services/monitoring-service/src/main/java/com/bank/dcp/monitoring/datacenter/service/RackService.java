@@ -1,7 +1,6 @@
 package com.bank.dcp.monitoring.datacenter.service;
 
 import com.bank.dcp.monitoring.common.PageableValidator;
-import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import com.bank.dcp.monitoring.common.exception.ResourceNotFoundException;
 import com.bank.dcp.monitoring.datacenter.dto.RackPatchRequest;
 import com.bank.dcp.monitoring.datacenter.dto.RackRequest;
@@ -16,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Objects;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -46,8 +46,8 @@ public class RackService {
 
     @Transactional
     public RackResponse create(RackRequest request) {
-        Rack rack = mapper.toEntity(request);
-        rack.setDataCenter(getDataCenterById(request.dataCenterId()));
+        DataCenter dataCenter = getDataCenterById(request.dataCenterId());
+        Rack rack = mapper.toEntity(request, dataCenter);
         Rack savedRack = repository.saveAndFlush(rack);
 
         return mapper.toResponse(savedRack);
@@ -56,22 +56,10 @@ public class RackService {
     @Transactional
     public RackResponse patch(UUID id, RackPatchRequest request) {
         Rack rack = getRackById(id);
-
-        if (Objects.nonNull(request.dataCenterId())) {
-            rack.setDataCenter(getDataCenterById(request.dataCenterId()));
-        }
-        if (Objects.nonNull(request.code())) {
-            rack.setCode(request.code());
-        }
-        if (Objects.nonNull(request.name())) {
-            rack.setName(request.name());
-        }
-        if (Objects.nonNull(request.powerCapacityW())) {
-            rack.setPowerCapacityW(request.powerCapacityW());
-        }
-        if (Objects.nonNull(request.status())) {
-            rack.setStatus(request.status());
-        }
+        DataCenter dataCenter = Objects.isNull(request.dataCenterId())
+                ? null
+                : getDataCenterById(request.dataCenterId());
+        mapper.patch(request, dataCenter, rack);
 
         Rack savedRack = repository.saveAndFlush(rack);
         return mapper.toResponse(savedRack);
@@ -80,7 +68,7 @@ public class RackService {
     @Transactional
     public void deactivate(UUID id) {
         Rack rack = getRackById(id);
-        rack.setStatus(InfrastructureStatus.INACTIVE);
+        mapper.deactivate(rack);
         repository.saveAndFlush(rack);
     }
 
