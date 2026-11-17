@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.datacenter.dto;
 
+import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
@@ -11,7 +12,7 @@ public record RackResponse(
         String code,
         String name,
         BigDecimal powerCapacityW,
-        String status,
+        InfrastructureStatus status,
         Instant createdAt,
         Instant updatedAt
 ) {

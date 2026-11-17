@@ -1,6 +1,7 @@
 package com.bank.dcp.monitoring.datacenter.entity;
 
 import jakarta.persistence.*;
+import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import java.time.Instant;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -38,7 +39,9 @@ public class DataCenter {
     }
 
     @PreUpdate
-    void onUpdate() { updatedAt = Instant.now(); }
+    void onUpdate() {
+        updatedAt = Instant.now();
+    }
     @Column(name="code", length = 32, nullable = false)
     private String code;
     @Column(name="name", length = 150, nullable = false)
@@ -49,6 +52,7 @@ public class DataCenter {
     private String timezone;
     @Column(name="pue_target")
     private BigDecimal pueTarget;
-    @Column(name="status", length = 20, nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 20, nullable = false)
+    private InfrastructureStatus status;
 }

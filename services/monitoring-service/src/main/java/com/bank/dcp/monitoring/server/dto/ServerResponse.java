@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.server.dto;
 
+import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
@@ -15,7 +16,7 @@ public record ServerResponse(
         Integer cpuCores,
         BigDecimal ramGb,
         BigDecimal ratedPowerW,
-        String status,
+        InfrastructureStatus status,
         Instant installedAt,
         Instant createdAt,
         Instant updatedAt

@@ -1,6 +1,7 @@
 package com.bank.dcp.monitoring.source.entity;
 
 import jakarta.persistence.*;
+import com.bank.dcp.monitoring.common.enums.MeasurementSourceStatus;
 import java.time.Instant;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -30,8 +31,9 @@ public class MeasurementSource {
     private String type;
     @Column(name="endpoint", length = 500)
     private String endpoint;
+    @Enumerated(EnumType.STRING)
     @Column(name="status", length = 20, nullable = false)
-    private String status;
+    private MeasurementSourceStatus status;
     @Column(name="poll_interval_sec")
     private Integer pollIntervalSec;
     @Column(name="last_success_at")

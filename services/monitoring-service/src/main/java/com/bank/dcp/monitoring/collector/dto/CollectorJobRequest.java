@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.collector.dto;
 
+import com.bank.dcp.monitoring.common.enums.CollectorJobStatus;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ public record CollectorJobRequest(
         Long recordsReceived,
         Long recordsSaved,
         Long recordsRejected,
-        String status,
+        CollectorJobStatus status,
         String errorMessage
 ) {
 }

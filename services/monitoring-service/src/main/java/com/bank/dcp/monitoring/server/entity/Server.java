@@ -1,6 +1,7 @@
 package com.bank.dcp.monitoring.server.entity;
 
 import jakarta.persistence.*;
+import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import java.time.Instant;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -39,7 +40,9 @@ public class Server {
     }
 
     @PreUpdate
-    void onUpdate() { updatedAt = Instant.now(); }
+    void onUpdate() {
+        updatedAt = Instant.now();
+    }
     @Column(name="hostname", length = 120, nullable = false)
     private String hostname;
     @Column(name="asset_tag", length = 64, nullable = false)
@@ -54,8 +57,9 @@ public class Server {
     private BigDecimal ramGb;
     @Column(name="rated_power_w")
     private BigDecimal ratedPowerW;
-    @Column(name="status", length = 20, nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 20, nullable = false)
+    private InfrastructureStatus status;
     @Column(name="installed_at")
     private Instant installedAt;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

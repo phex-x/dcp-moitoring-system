@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.measurement.dto;
 
+import com.bank.dcp.monitoring.common.enums.MeasurementQualityStatus;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
@@ -14,7 +15,7 @@ public record EnergyMeasurementRequest(
         BigDecimal cpuLoadPct,
         BigDecimal memoryUsagePct,
         BigDecimal temperatureC,
-        String qualityStatus,
+        MeasurementQualityStatus qualityStatus,
         String checksum
 ) {
 }
