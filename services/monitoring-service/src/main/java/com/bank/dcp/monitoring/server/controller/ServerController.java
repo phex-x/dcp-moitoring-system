@@ -25,32 +25,32 @@ import java.util.UUID;
 @RequestMapping("/api/v1/servers")
 @RequiredArgsConstructor
 public class ServerController {
-    private final ServerService service;
+    private final ServerService serverService;
 
     @GetMapping
     public Page<ServerResponse> list(@PageableDefault(size = 20) Pageable pageable) {
-        return service.list(pageable);
+        return serverService.list(pageable);
     }
 
     @GetMapping("/{id}")
     public ServerResponse getById(@PathVariable UUID id) {
-        return service.getById(id);
+        return serverService.getById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse create(@Valid @RequestBody ServerRequest request) {
-        return service.create(request);
+        return serverService.create(request);
     }
 
     @PatchMapping("/{id}")
     public ServerResponse patch(@PathVariable UUID id, @Valid @RequestBody ServerPatchRequest request) {
-        return service.patch(id, request);
+        return serverService.patch(id, request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deactivate(@PathVariable UUID id) {
-        service.deactivate(id);
+        serverService.deactivate(id);
     }
 }

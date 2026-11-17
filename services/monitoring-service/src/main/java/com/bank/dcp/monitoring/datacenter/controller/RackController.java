@@ -25,32 +25,32 @@ import java.util.UUID;
 @RequestMapping("/api/v1/racks")
 @RequiredArgsConstructor
 public class RackController {
-    private final RackService service;
+    private final RackService rackService;
 
     @GetMapping
     public Page<RackResponse> list(@PageableDefault(size = 20) Pageable pageable) {
-        return service.list(pageable);
+        return rackService.list(pageable);
     }
 
     @GetMapping("/{id}")
     public RackResponse getById(@PathVariable UUID id) {
-        return service.getById(id);
+        return rackService.getById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public RackResponse create(@Valid @RequestBody RackRequest request) {
-        return service.create(request);
+        return rackService.create(request);
     }
 
     @PatchMapping("/{id}")
     public RackResponse patch(@PathVariable UUID id, @Valid @RequestBody RackPatchRequest request) {
-        return service.patch(id, request);
+        return rackService.patch(id, request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deactivate(@PathVariable UUID id) {
-        service.deactivate(id);
+        rackService.deactivate(id);
     }
 }

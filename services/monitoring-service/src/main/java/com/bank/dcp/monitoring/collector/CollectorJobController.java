@@ -15,10 +15,10 @@ import java.util.UUID;
 @RequestMapping("/api/v1/collector/jobs")
 @RequiredArgsConstructor
 public class CollectorJobController {
-    private final CollectorJobService service;
+    private final CollectorJobService collectorJobService;
 
     @GetMapping
     public Page<CollectorJobResponse> list(@RequestParam(required = false) UUID sourceId, @PageableDefault(size = 20) Pageable pageable) {
-        return service.list(sourceId, pageable);
+        return collectorJobService.list(sourceId, pageable);
     }
 }

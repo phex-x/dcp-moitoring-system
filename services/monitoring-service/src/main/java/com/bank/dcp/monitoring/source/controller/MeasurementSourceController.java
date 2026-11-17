@@ -28,42 +28,42 @@ import java.util.UUID;
 @RequestMapping("/api/v1/sources")
 @RequiredArgsConstructor
 public class MeasurementSourceController {
-    private final MeasurementSourceService service;
+    private final MeasurementSourceService measurementSourceService;
 
     @GetMapping
     public Page<MeasurementSourceResponse> list(@PageableDefault(size = 20) Pageable pageable) {
-        return service.list(pageable);
+        return measurementSourceService.list(pageable);
     }
 
     @GetMapping("/{id}")
     public MeasurementSourceResponse getById(@PathVariable UUID id) {
-        return service.getById(id);
+        return measurementSourceService.getById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public MeasurementSourceResponse create(@Valid @RequestBody MeasurementSourceRequest request) {
-        return service.create(request);
+        return measurementSourceService.create(request);
     }
 
     @PatchMapping("/{id}")
     public MeasurementSourceResponse patch(@PathVariable UUID id, @Valid @RequestBody MeasurementSourcePatchRequest request) {
-        return service.patch(id, request);
+        return measurementSourceService.patch(id, request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deactivate(@PathVariable UUID id) {
-        service.deactivate(id);
+        measurementSourceService.deactivate(id);
     }
 
     @PostMapping("/{id}/test")
     public SourceAvailabilityResponse test(@PathVariable UUID id) {
-        return service.test(id);
+        return measurementSourceService.test(id);
     }
 
     @PostMapping("/{id}/sync")
     public CollectorJobResponse synchronize(@PathVariable UUID id, @Valid @RequestBody(required = false) CollectorSyncRequest request) {
-        return service.synchronize(id, request);
+        return measurementSourceService.synchronize(id, request);
     }
 }
