@@ -25,32 +25,32 @@ import java.util.UUID;
 @RequestMapping("/api/v1/data-centers")
 @RequiredArgsConstructor
 public class DataCenterController {
-    private final DataCenterService service;
+    private final DataCenterService dataCenterService;
 
     @GetMapping
     public Page<DataCenterResponse> list(@PageableDefault(size = 20) Pageable pageable) {
-        return service.list(pageable);
+        return dataCenterService.list(pageable);
     }
 
     @GetMapping("/{id}")
     public DataCenterResponse getById(@PathVariable UUID id) {
-        return service.getById(id);
+        return dataCenterService.getById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public DataCenterResponse create(@Valid @RequestBody DataCenterRequest request) {
-        return service.create(request);
+        return dataCenterService.create(request);
     }
 
     @PatchMapping("/{id}")
     public DataCenterResponse patch(@PathVariable UUID id, @Valid @RequestBody DataCenterPatchRequest request) {
-        return service.patch(id, request);
+        return dataCenterService.patch(id, request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deactivate(@PathVariable UUID id) {
-        service.deactivate(id);
+        dataCenterService.deactivate(id);
     }
 }

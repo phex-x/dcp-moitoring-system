@@ -3,7 +3,6 @@ package com.bank.dcp.monitoring.collector.entity;
 import jakarta.persistence.*;
 import com.bank.dcp.monitoring.common.enums.CollectorJobStatus;
 import java.time.Instant;
-import java.math.BigDecimal;
 import java.util.UUID;
 import com.bank.dcp.monitoring.source.entity.MeasurementSource;
 

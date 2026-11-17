@@ -1,5 +1,6 @@
 package com.bank.dcp.monitoring.common;
 
+import com.bank.dcp.monitoring.common.exception.BusinessRuleViolationException;
 import com.bank.dcp.monitoring.common.exception.InvalidRequestException;
 import com.bank.dcp.monitoring.common.exception.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -32,6 +33,11 @@ public class MonitoringExceptionHandler {
             detail.setProperty("fields", fields);
         }
         return ResponseEntity.badRequest().body(detail);
+    }
+
+    @ExceptionHandler(BusinessRuleViolationException.class)
+    ResponseEntity<ProblemDetail> businessRuleViolation(BusinessRuleViolationException exception) {
+        return problem(HttpStatus.UNPROCESSABLE_ENTITY, "BUSINESS_RULE_VIOLATION", exception.getMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

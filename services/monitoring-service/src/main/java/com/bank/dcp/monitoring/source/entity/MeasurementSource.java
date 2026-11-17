@@ -2,8 +2,8 @@ package com.bank.dcp.monitoring.source.entity;
 
 import jakarta.persistence.*;
 import com.bank.dcp.monitoring.common.enums.MeasurementSourceStatus;
+import com.bank.dcp.monitoring.common.enums.MeasurementSourceType;
 import java.time.Instant;
-import java.math.BigDecimal;
 import java.util.UUID;
 import com.bank.dcp.monitoring.datacenter.entity.DataCenter;
 
@@ -27,8 +27,9 @@ public class MeasurementSource {
     private UUID id;
     @Column(name="name", length = 150, nullable = false)
     private String name;
-    @Column(name="type", length = 32, nullable = false)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", length = 32, nullable = false)
+    private MeasurementSourceType type;
     @Column(name="endpoint", length = 500)
     private String endpoint;
     @Enumerated(EnumType.STRING)

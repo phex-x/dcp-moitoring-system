@@ -1,7 +1,6 @@
 package com.bank.dcp.monitoring.datacenter.service;
 
 import com.bank.dcp.monitoring.common.PageableValidator;
-import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import com.bank.dcp.monitoring.common.exception.ResourceNotFoundException;
 import com.bank.dcp.monitoring.datacenter.dto.DataCenterPatchRequest;
 import com.bank.dcp.monitoring.datacenter.dto.DataCenterRequest;
@@ -53,25 +52,7 @@ public class DataCenterService {
     @Transactional
     public DataCenterResponse patch(UUID id, DataCenterPatchRequest request) {
         DataCenter entity = getDataCenterById(id);
-
-        if (Objects.nonNull(request.code())) {
-            entity.setCode(request.code());
-        }
-        if (Objects.nonNull(request.name())) {
-            entity.setName(request.name());
-        }
-        if (Objects.nonNull(request.location())) {
-            entity.setLocation(request.location());
-        }
-        if (Objects.nonNull(request.timezone())) {
-            entity.setTimezone(request.timezone());
-        }
-        if (Objects.nonNull(request.pueTarget())) {
-            entity.setPueTarget(request.pueTarget());
-        }
-        if (Objects.nonNull(request.status())) {
-            entity.setStatus(request.status());
-        }
+        mapper.patch(request, entity);
 
         DataCenter savedEntity = repository.saveAndFlush(entity);
         return mapper.toResponse(savedEntity);
@@ -80,7 +61,7 @@ public class DataCenterService {
     @Transactional
     public void deactivate(UUID id) {
         DataCenter entity = getDataCenterById(id);
-        entity.setStatus(InfrastructureStatus.INACTIVE);
+        mapper.deactivate(entity);
         repository.saveAndFlush(entity);
     }
 

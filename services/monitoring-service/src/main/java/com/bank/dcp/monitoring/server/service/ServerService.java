@@ -1,7 +1,6 @@
 package com.bank.dcp.monitoring.server.service;
 
 import com.bank.dcp.monitoring.common.PageableValidator;
-import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
 import com.bank.dcp.monitoring.common.exception.ResourceNotFoundException;
 import com.bank.dcp.monitoring.datacenter.entity.Rack;
 import com.bank.dcp.monitoring.datacenter.repository.RackRepository;
@@ -16,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Objects;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -47,8 +47,8 @@ public class ServerService {
 
     @Transactional
     public ServerResponse create(ServerRequest request) {
-        Server server = mapper.toEntity(request);
-        server.setRack(getRackById(request.rackId()));
+        Rack rack = getRackById(request.rackId());
+        Server server = mapper.toEntity(request, rack);
         Server savedServer = repository.saveAndFlush(server);
 
         return mapper.toResponse(savedServer);
@@ -57,37 +57,10 @@ public class ServerService {
     @Transactional
     public ServerResponse patch(UUID id, ServerPatchRequest request) {
         Server server = getServerById(id);
-
-        if (Objects.nonNull(request.rackId())) {
-            server.setRack(getRackById(request.rackId()));
-        }
-        if (Objects.nonNull(request.hostname())) {
-            server.setHostname(request.hostname());
-        }
-        if (Objects.nonNull(request.assetTag())) {
-            server.setAssetTag(request.assetTag());
-        }
-        if (Objects.nonNull(request.vendor())) {
-            server.setVendor(request.vendor());
-        }
-        if (Objects.nonNull(request.model())) {
-            server.setModel(request.model());
-        }
-        if (Objects.nonNull(request.cpuCores())) {
-            server.setCpuCores(request.cpuCores());
-        }
-        if (Objects.nonNull(request.ramGb())) {
-            server.setRamGb(request.ramGb());
-        }
-        if (Objects.nonNull(request.ratedPowerW())) {
-            server.setRatedPowerW(request.ratedPowerW());
-        }
-        if (Objects.nonNull(request.status())) {
-            server.setStatus(request.status());
-        }
-        if (Objects.nonNull(request.installedAt())) {
-            server.setInstalledAt(request.installedAt());
-        }
+        Rack rack = Objects.isNull(request.rackId())
+                ? null
+                : getRackById(request.rackId());
+        mapper.patch(request, rack, server);
 
         Server savedServer = repository.saveAndFlush(server);
         return mapper.toResponse(savedServer);
@@ -96,7 +69,7 @@ public class ServerService {
     @Transactional
     public void deactivate(UUID id) {
         Server server = getServerById(id);
-        server.setStatus(InfrastructureStatus.INACTIVE);
+        mapper.deactivate(server);
         repository.saveAndFlush(server);
     }
 

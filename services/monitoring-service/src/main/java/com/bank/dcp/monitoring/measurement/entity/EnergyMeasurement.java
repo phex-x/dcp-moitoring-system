@@ -2,7 +2,6 @@ package com.bank.dcp.monitoring.measurement.entity;
 
 import jakarta.persistence.*;
 import com.bank.dcp.monitoring.common.enums.MeasurementQualityStatus;
-import com.bank.dcp.monitoring.common.enums.MeasurementQualityStatus;
 import java.time.Instant;
 import java.math.BigDecimal;
 import java.util.UUID;
