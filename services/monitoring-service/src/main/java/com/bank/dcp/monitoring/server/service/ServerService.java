@@ -1,6 +1,8 @@
 package com.bank.dcp.monitoring.server.service;
 
 import com.bank.dcp.monitoring.common.PageableValidator;
+import com.bank.dcp.monitoring.common.enums.InfrastructureStatus;
+import com.bank.dcp.monitoring.common.exception.BusinessRuleViolationException;
 import com.bank.dcp.monitoring.common.exception.ResourceNotFoundException;
 import com.bank.dcp.monitoring.datacenter.entity.Rack;
 import com.bank.dcp.monitoring.datacenter.repository.RackRepository;
@@ -57,6 +59,9 @@ public class ServerService {
     @Transactional
     public ServerResponse patch(UUID id, ServerPatchRequest request) {
         Server server = getServerById(id);
+        if (Objects.nonNull(request.status()) && !server.getStatus().canTransitionTo(request.status())) {
+            throw new BusinessRuleViolationException("Invalid InfrastructureStatus transition");
+        }
         Rack rack = Objects.isNull(request.rackId())
                 ? null
                 : getRackById(request.rackId());
@@ -69,6 +74,9 @@ public class ServerService {
     @Transactional
     public void deactivate(UUID id) {
         Server server = getServerById(id);
+        if (!server.getStatus().canTransitionTo(InfrastructureStatus.INACTIVE)) {
+            throw new BusinessRuleViolationException("Decommissioned infrastructure cannot be deactivated");
+        }
         mapper.deactivate(server);
         repository.saveAndFlush(server);
     }

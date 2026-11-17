@@ -75,6 +75,9 @@ public class MeasurementSourceService {
     @Transactional
     public MeasurementSourceResponse patch(UUID id, MeasurementSourcePatchRequest request) {
         MeasurementSource source = getSourceById(id);
+        if (Objects.nonNull(request.status()) && !source.getStatus().canTransitionTo(request.status())) {
+            throw new BusinessRuleViolationException("Invalid MeasurementSourceStatus transition");
+        }
         DataCenter dataCenter = Objects.isNull(request.dataCenterId())
                 ? null
                 : getDataCenterById(request.dataCenterId());
@@ -87,6 +90,9 @@ public class MeasurementSourceService {
     @Transactional
     public void deactivate(UUID id) {
         MeasurementSource source = getSourceById(id);
+        if (!source.getStatus().canTransitionTo(MeasurementSourceStatus.INACTIVE)) {
+            throw new BusinessRuleViolationException("Source cannot transition to INACTIVE");
+        }
         sourceMapper.deactivate(source);
         sourceRepository.saveAndFlush(source);
     }
@@ -96,7 +102,7 @@ public class MeasurementSourceService {
         MeasurementSource source = getSourceById(id);
         Instant checkedAt = Instant.now();
         boolean available = source.getType() == MeasurementSourceType.SIMULATOR
-                && source.getStatus() == MeasurementSourceStatus.ACTIVE;
+                && source.getStatus() != MeasurementSourceStatus.INACTIVE;
         String message = available
                 ? "Simulator source is available"
                 : "Source is inactive or has no registered collector";

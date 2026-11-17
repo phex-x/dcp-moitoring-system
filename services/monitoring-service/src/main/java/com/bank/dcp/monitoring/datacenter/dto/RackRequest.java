@@ -17,8 +17,8 @@ public record RackRequest(
         @Size(max = 32) String code,
         @NotBlank
         @Size(max = 150) String name,
-        @DecimalMin("0.0") BigDecimal powerCapacityW,
-        @NotNull
+        @DecimalMin("0.0")
+        BigDecimal powerCapacityW,
         InfrastructureStatus status
 ) {
 }

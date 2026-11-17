@@ -4,7 +4,8 @@ import com.bank.dcp.monitoring.common.enums.MeasurementSourceStatus;
 import com.bank.dcp.monitoring.common.enums.MeasurementSourceType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import java.util.UUID;
@@ -22,7 +23,8 @@ public record MeasurementSourceRequest(
         String endpoint,
         @NotNull
         MeasurementSourceStatus status,
-        @Positive
+        @Min(1)
+        @Max(86400)
         Integer pollIntervalSec
 ) {
 }
